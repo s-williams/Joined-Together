@@ -113,7 +113,7 @@ scene("game", () => {
 
     player.collides("border", () => {
         destroy(player);
-        //camShake(120);
+        camShake(120);
         makeExplosion(vec2(width() / 2, height() / 2), 12, 120, 30);
         wait(2, () => {
             go("menu", score);
@@ -157,6 +157,17 @@ scene("game", () => {
                 this.scale.y += n;
             },
         };
+    };
+
+    let camShake = () => {
+        for (i = 0; i < 5; i++) {
+            wait(0.1 * i, () => {
+                every((obj) => {
+                    obj.angle = rand(0, 360);
+                    obj.move(rand(0, WIDTH), rand(0, HEIGHT));
+                });
+            });
+        }
     };
 
     let shoot = () => {
