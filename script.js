@@ -19,19 +19,24 @@ scene("menu", (score) => {
     }
 
     add([
-        text("Joined Together"),
+        text("Triple Engine"),
         pos(240, 80),
         scale(3),
     ]);
     add([
-        text("High Score: " + highScore),
+        text("Your High Score: " + highScore),
         pos(240, 160),
+        scale(2),
+    ]);
+    add([
+        text("Author High Score: " + 85),
+        pos(240, 200),
         scale(2),
     ]);
 
     add([
         rect(160, 20),
-        pos(240, 240),
+        pos(240, 280),
         "button",
         {
             clickAction: () => go('game'),
@@ -40,7 +45,7 @@ scene("menu", (score) => {
 
     add([
         text("Play game"),
-        pos(240, 240),
+        pos(240, 280),
         color(0, 0, 0)
     ]);
 
