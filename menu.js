@@ -104,7 +104,54 @@ scene("credits", () => {
         origin("center"),
         color(0, 0, 0)
     ]);
-
+    add([
+        text("Programming:"),
+        pos(240, 100),
+        origin("center"),
+        scale(1),
+    ]);
+    add([
+        text("swilliamsio"),
+        pos(240, 120),
+        origin("center"),
+        scale(2),
+    ]);
+    add([
+        text("https://www.swilliams.io/"),
+        pos(240, 140),
+        origin("center"),
+        scale(1),
+        "button",
+        {
+            clickAction: () => {
+                window.open("https://www.swilliams.io/", '_blank').focus();
+            }
+        },
+    ]);
+    add([
+        text("Music & SFX:"),
+        pos(240, 180),
+        origin("center"),
+        scale(1),
+    ]);
+    add([
+        text("Silver Pine Project"),
+        pos(240, 200),
+        origin("center"),
+        scale(2),
+    ]);
+    add([
+        text("https://linktr.ee/silverpineproject"),
+        pos(240, 220),
+        origin("center"),
+        scale(1),
+        "button",
+        {
+            clickAction: () => {
+                window.open("https://linktr.ee/silverpineproject", '_blank').focus();
+            }
+        },
+    ]);
     action("button", b => {
         if (b.isHovered()) {
             b.use(color(0.7, 0.7, 0.7));
@@ -172,4 +219,4 @@ scene("instructions", () => {
     keyPress("3", () => { go('menu'); });
 });
 
-start("menu");
+start("credits");
