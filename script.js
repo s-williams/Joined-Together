@@ -16,6 +16,7 @@ const ENEMY_HEALTH = 5;
 const ENEMY_SPEED = 50;
 const STAR_SPEED = 400;
 const POWERUP_DURATION = 15;
+const POWERUP_FREQUENCY = 15;
 
 loadSprite("playerTop", "sprites/PlayerTop.png");
 loadSprite("playerMid", "sprites/PlayerMid.png");
@@ -24,6 +25,7 @@ loadSprite("playerTopInvincible", "sprites/PlayerTopInvincible.png");
 loadSprite("playerMidInvincible", "sprites/PlayerMidInvincible.png");
 loadSprite("playerBottomInvincible", "sprites/PlayerBottomInvincible.png");
 loadSprite("powerUpInvincibility", "sprites/PowerUpInvincibility.png");
+loadSprite("powerUpWipe", "sprites/PowerUpWipe.png");
 loadSprite("enemy", "sprites/Enemy.png");
 
 scene("game", () => {
@@ -192,17 +194,30 @@ scene("game", () => {
 
     // Power up
     let spawnPowerUp = () => {
-        add([
-            sprite("powerUpInvincibility"),
-            pos(width() + 10, rand(0, height())),
-            origin("center"),
-            "powerUp",
-            "invincibility",
-            {
-                speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
-            },
-        ]);
-        wait(2, spawnPowerUp);
+        if (rand(0, 2) > 1) {
+            add([
+                sprite("powerUpInvincibility"),
+                pos(width() + 10, rand(0, height())),
+                origin("center"),
+                "powerUp",
+                "invincibility",
+                {
+                    speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
+                },
+            ]);
+        } else {
+            add([
+                sprite("powerUpWipe"),
+                pos(width() + 10, rand(0, height())),
+                origin("center"),
+                "powerUp",
+                "wipe",
+                {
+                    speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
+                },
+            ]);
+        }
+        wait(rand(POWERUP_FREQUENCY * 0.8, POWERUP_FREQUENCY * 1.2), spawnPowerUp);
     };
     action("powerUp", (powerUp) => { moveLeft(powerUp); });
 
@@ -332,6 +347,10 @@ scene("game", () => {
                 invincible = false;
             });
 
+        } else if (powerUp.is("wipe")) {
+            every("enemy", (enemy) => {
+                enemy.hurt(999);
+            });
         }
         destroy(powerUp);
     });
