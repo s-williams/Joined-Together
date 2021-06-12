@@ -18,7 +18,7 @@ scene("menu", (score) => {
         scale(2),
     ]);
     add([
-        text("Author High Score: " + 0),
+        text("Author High Score: " + 50),
         pos(240, 200),
         origin("center"),
         scale(2),
