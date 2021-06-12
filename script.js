@@ -9,7 +9,7 @@ kaboom({
 });
 
 const SPEED = 150;
-const SHOOT_TIMEOUT = 0.1;
+const SHOOT_TIMEOUT = 0.15;
 const BULLET_SPEED = 400;
 const BULLET_DAMAGE = 1;
 const ENEMY_HEALTH = 5;
@@ -17,7 +17,7 @@ const ENEMY_SPEED = 50;
 const ENEMY_SHOT_FREQ = 5;
 const STAR_SPEED = 400;
 const POWERUP_DURATION = 15;
-const POWERUP_FREQUENCY = 1;
+const POWERUP_FREQUENCY = 10;
 const PLAYER_SECTION_OFFSET_X = 20;
 const PLAYER_SECTION_OFFSET_Y = 20;
 const MOVEMENT_DELAY = 0.5;
@@ -43,13 +43,14 @@ scene("game", () => {
     let score = 0;
     let dead = false;
     let invincible = false;
-    let strength = 5;
+    let strength = 0;
     let shootTimeout = - SHOOT_TIMEOUT / 2;
     let secondTimer = 0;
     let lastMoved = 0;
+    let wave = 0;
+    let endlessMode = false;
 
     const music = play("spaceCrazy");
-
 
     // UI
     layers([
@@ -74,7 +75,7 @@ scene("game", () => {
             score++;
         }
         // Reset movement after movement timeout (deals with glitch due to overloading JS)
-        if (time() > lastMoved + MOVEMENT_RESET_TIMEOUT) {
+        else if (time() > lastMoved + MOVEMENT_RESET_TIMEOUT) {
             lastMoved = time();
             resetMovement();
         }
@@ -216,10 +217,10 @@ scene("game", () => {
     };
 
     // Generic enemy
-    let spawnEnemy = () => {
+    let spawnEnemy = (y) => {
         add([
             sprite("enemy"),
-            pos(width() + 10, rand(0, height())),
+            pos(width() + 10, y),
             health(rand(ENEMY_HEALTH - 3, ENEMY_HEALTH + 3)),
             origin("center"),
             color(1, 1, 0),
@@ -228,15 +229,14 @@ scene("game", () => {
                 speed: rand(ENEMY_SPEED * 0.5, ENEMY_SPEED * 1.5),
             },
         ]);
-        wait(0.3, spawnEnemy);
     };
     action("enemy", (enemy) => { moveLeft(enemy); });
 
     // Shooting enemy
-    let spawnEnemyShooter = () => {
+    let spawnEnemyShooter = (y) => {
         add([
             sprite("enemyShooter"),
-            pos(width() + 10, rand(0, height())),
+            pos(width() + 10, y),
             health(rand(ENEMY_HEALTH - 0, ENEMY_HEALTH + 6)),
             origin("center"),
             color(1, 1, 0),
@@ -248,7 +248,6 @@ scene("game", () => {
                 lastShot: time() - ENEMY_SHOT_FREQ / 2,
             },
         ]);
-        wait(1, spawnEnemyShooter);
     };
     action("enemyShooter", (enemyShooter) => {
         if (time() > enemyShooter.lastShot + enemyShooter.shotFreq) {
@@ -256,6 +255,52 @@ scene("game", () => {
             spawnBullet(enemyShooter.pos, rgb(255, 255, 0), 5, "enemyBullet");
         }
     });
+
+    // Waves array, each row is a wave
+    // First position decides delay 
+    // Next positions decides enemies to spawn
+    // g = generic, s = shooter
+    const waves = [
+        // Relative safety to start
+        [1, "g"],
+        [7, "g", "g"],
+        [8, "g", "g", "g"],
+        [8, "s"],
+        // First proper wave
+        [8, "g", "g", "g", "g", "g"],
+        [2, "s", "s"],
+        [12, "g", "g", "g", "g", "g", "g", "g"],
+        [12, "g", "s", "g", "s", "g", "s", "g"],
+        [1, "g"],
+    ];
+    // Spawn waves
+    let spawnWave = (currentWave) => {
+        if (currentWave < waves.length) {
+            wait(waves[currentWave][0], () => {
+                console.log(currentWave);
+                let enemyCountInWave = waves[currentWave].length - 1;
+                for (let i = 1; i < waves.length; i++) {
+                    let spawnPosition = Math.round(i * (((height() - 80) / (enemyCountInWave + 1)))) + 40;
+                    if (waves[currentWave][i] === "g") {
+                        spawnEnemy(spawnPosition);
+                    } else if (waves[currentWave][i] === "s") {
+                        spawnEnemyShooter(spawnPosition);
+                    }
+                }
+                wave = wave + 1;
+                spawnWave(wave);
+            });
+        } else {
+            // Out of planned waves, just spawn chaotically
+            console.log("Out of waves!");
+            spawnEndless(0.5, spawnEnemy);
+            spawnEndless(1.5, spawnEnemyShooter);
+        }
+    };
+    let spawnEndless = (delay, enemyFunction) => {
+        enemyFunction(rand(0, height()));
+        wait(delay, () => spawnEndless(delay, enemyFunction));
+    };
 
     // Background stars
     let spawnStar = () => {
@@ -286,7 +331,7 @@ scene("game", () => {
     // Power up
     let spawnPowerUp = () => {
         let choose = strength >= STRENGTH_MAX ? rand(0, 2) : rand(0, 3);
-        if (choose > 2) {
+        if (strength === 0 || choose > 2) {
             add([
                 sprite("powerUpStrength"),
                 pos(width() + 10, rand(50, height() - 50)),
@@ -350,7 +395,7 @@ scene("game", () => {
         });
     };
 
-    // shooting mechanics
+    // Shooting mechanics
     let shoot = () => {
         if (!dead) {
             if (time() > shootTimeout + SHOOT_TIMEOUT) {
@@ -436,7 +481,7 @@ scene("game", () => {
     keyDown("space", () => { shoot(); });
     mouseDown(() => { shoot(); });
 
-    //Collisions
+    // Collisions
     player.collides("border", () => { die(); });
     playerBallTop.collides("border", () => { die(); });
     playerBallBottom.collides("border", () => { die(); });
@@ -501,8 +546,7 @@ scene("game", () => {
     });
 
     // To start the adventure
-    spawnEnemy();
+    wait(1, () => spawnWave(wave));
     spawnStar();
-    spawnPowerUp();
-    spawnEnemyShooter();
+    wait(20, () => spawnPowerUp());
 });
