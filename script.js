@@ -17,11 +17,12 @@ const ENEMY_SPEED = 50;
 const ENEMY_SHOT_FREQ = 5;
 const STAR_SPEED = 400;
 const POWERUP_DURATION = 15;
-const POWERUP_FREQUENCY = 15;
+const POWERUP_FREQUENCY = 1;
 const PLAYER_SECTION_OFFSET_X = 20;
 const PLAYER_SECTION_OFFSET_Y = 20;
 const MOVEMENT_DELAY = 0.5;
 const MOVEMENT_RESET_TIMEOUT = 0.6;
+const STRENGTH_MAX = 5;
 
 loadSprite("playerTop", "sprites/PlayerTop.png");
 loadSprite("playerMid", "sprites/PlayerMid.png");
@@ -31,6 +32,7 @@ loadSprite("playerMidInvincible", "sprites/PlayerMidInvincible.png");
 loadSprite("playerBottomInvincible", "sprites/PlayerBottomInvincible.png");
 loadSprite("powerUpInvincibility", "sprites/PowerUpInvincibility.png");
 loadSprite("powerUpWipe", "sprites/PowerUpWipe.png");
+loadSprite("powerUpStrength", "sprites/PowerUpStrength.png");
 loadSprite("enemy", "sprites/Enemy.png");
 loadSprite("enemyShooter", "sprites/EnemyShooter.png");
 
@@ -41,6 +43,7 @@ scene("game", () => {
     let score = 0;
     let dead = false;
     let invincible = false;
+    let strength = 5;
     let shootTimeout = - SHOOT_TIMEOUT / 2;
     let secondTimer = 0;
     let lastMoved = 0;
@@ -282,24 +285,36 @@ scene("game", () => {
 
     // Power up
     let spawnPowerUp = () => {
-        if (rand(0, 2) > 1) {
+        let choose = strength >= STRENGTH_MAX ? rand(0, 2) : rand(0, 3);
+        if (choose > 2) {
             add([
-                sprite("powerUpInvincibility"),
+                sprite("powerUpStrength"),
                 pos(width() + 10, rand(50, height() - 50)),
                 origin("center"),
                 "powerUp",
-                "invincibility",
+                "strength",
                 {
                     speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
                 },
             ]);
-        } else {
+        } else if (choose > 1) {
             add([
                 sprite("powerUpWipe"),
                 pos(width() + 10, rand(50, height() - 50)),
                 origin("center"),
                 "powerUp",
                 "wipe",
+                {
+                    speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
+                },
+            ]);
+        } else {
+            add([
+                sprite("powerUpInvincibility"),
+                pos(width() + 10, rand(50, height() - 50)),
+                origin("center"),
+                "powerUp",
+                "invincibility",
                 {
                     speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
                 },
@@ -340,8 +355,26 @@ scene("game", () => {
         if (!dead) {
             if (time() > shootTimeout + SHOOT_TIMEOUT) {
                 shootTimeout = time();
-                spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(255, 255, 255), 1, "bullet");
-                spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
+                if (strength === 0) {
+                    spawnBullet(playerBallBottom.pos, rgb(255, 255, 255), 1, "bullet");
+                } else if (strength === 1) {
+                    spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(255, 255, 255), 1, "bullet");
+                    spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
+                } else if (strength === 2) {
+                    spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(255, 255, 255), 1, "bullet");
+                    spawnBullet(playerBallBottom.pos, rgb(255, 255, 255), 1, "bullet");
+                    spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
+                } else if (strength === 3) {
+                    spawnBullet(playerBallBottom.pos.sub(0, 4), rgb(255, 255, 255), 1, "bullet");
+                    spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(255, 255, 255), 1, "bullet");
+                    spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
+                    spawnBullet(playerBallBottom.pos.add(0, 4), rgb(255, 255, 255), 1, "bullet");
+                } else {
+                    spawnBullet(playerBallBottom.pos.sub(0, 4), rgb(0, 255, 255), 1, "bullet");
+                    spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(0, 255, 255), 1, "bullet");
+                    spawnBullet(playerBallBottom.pos.add(0, 2), rgb(0, 255, 255), 1, "bullet");
+                    spawnBullet(playerBallBottom.pos.add(0, 4), rgb(0, 255, 255), 1, "bullet");
+                }
             }
         }
     };
@@ -430,7 +463,7 @@ scene("game", () => {
                 player.changeSprite("playerMidInvincible");
                 playerBallTop.changeSprite("playerTopInvincible");
                 playerBallBottom.changeSprite("playerBottomInvincible");
-            }); 
+            });
             wait(POWERUP_DURATION - 1, () => {
                 player.changeSprite("playerMid");
                 playerBallTop.changeSprite("playerTop");
@@ -456,12 +489,14 @@ scene("game", () => {
             every("enemyBullet", (enemyBullet) => {
                 destroy(enemyBullet);
             });
+        } else if (powerUp.is("strength")) {
+            strength++;
         }
         destroy(powerUp);
     });
     collides("bullet", "enemy", (bullet, enemy) => {
         destroy(bullet);
-        enemy.hurt(BULLET_DAMAGE);
+        enemy.hurt(BULLET_DAMAGE + strength);        
         makeExplosion(bullet.pos, 1, 6, 1);
     });
 
