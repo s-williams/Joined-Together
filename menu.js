@@ -135,7 +135,7 @@ scene("credits", () => {
         scale(1),
     ]);
     add([
-        text("Silver Pine Project"),
+        text("Silverpine Project"),
         pos(240, 200),
         origin("center"),
         scale(2),
