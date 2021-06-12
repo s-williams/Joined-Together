@@ -219,4 +219,4 @@ scene("instructions", () => {
     keyPress("3", () => { go('menu'); });
 });
 
-start("credits");
+start("menu");
