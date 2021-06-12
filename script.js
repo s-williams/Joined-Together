@@ -225,7 +225,7 @@ scene("game", () => {
         if (rand(0, 2) > 1) {
             add([
                 sprite("powerUpInvincibility"),
-                pos(width() + 10, rand(0, height())),
+                pos(width() + 10, rand(50, height() - 50)),
                 origin("center"),
                 "powerUp",
                 "invincibility",
@@ -236,7 +236,7 @@ scene("game", () => {
         } else {
             add([
                 sprite("powerUpWipe"),
-                pos(width() + 10, rand(0, height())),
+                pos(width() + 10, rand(50, height() - 50)),
                 origin("center"),
                 "powerUp",
                 "wipe",
