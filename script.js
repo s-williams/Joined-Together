@@ -18,6 +18,10 @@ const ENEMY_SHOT_FREQ = 5;
 const STAR_SPEED = 400;
 const POWERUP_DURATION = 15;
 const POWERUP_FREQUENCY = 15;
+const PLAYER_SECTION_OFFSET_X = 20;
+const PLAYER_SECTION_OFFSET_Y = 20;
+const MOVEMENT_DELAY = 0.5;
+const MOVEMENT_RESET_TIMEOUT = 0.6;
 
 loadSprite("playerTop", "sprites/PlayerTop.png");
 loadSprite("playerMid", "sprites/PlayerMid.png");
@@ -35,6 +39,8 @@ scene("game", () => {
     let dead = false;
     let invincible = false;
     let shootTimeout = - SHOOT_TIMEOUT / 2;
+    let secondTimer = 0;
+    let lastMoved = 0;
 
     // UI
     layers([
@@ -53,6 +59,16 @@ scene("game", () => {
     timerLabel.action(() => {
         timerLabel.time += dt();
         timerLabel.text = timerLabel.time.toFixed(2);
+        // Add 1 score every second
+        if (timerLabel.time > secondTimer + 1) {
+            secondTimer = timerLabel.time;
+            score++;
+        }
+        // Reset movement after movement timeout (deals with glitch due to overloading JS)
+        if (time() > lastMoved + MOVEMENT_RESET_TIMEOUT) {
+            lastMoved = time();
+            resetMovement();
+        }
     });
     let scoreLabel = add([
         text(0),
@@ -74,17 +90,23 @@ scene("game", () => {
     let playerBallTop = add([
         sprite("playerTop"),
         scale(1),
-        pos(40, 160),
+        pos(player.pos.x + PLAYER_SECTION_OFFSET_X, player.pos.y - PLAYER_SECTION_OFFSET_Y),
         origin("center"),
         "playerBall"
     ]);
     let playerBallBottom = add([
         sprite("playerBottom"),
         scale(1),
-        pos(40, 200),
+        pos(player.pos.x + PLAYER_SECTION_OFFSET_X, player.pos.y + PLAYER_SECTION_OFFSET_Y),
         origin("center"),
         "playerBall"
     ]);
+    let resetMovement = () => {
+        playerBallTop.pos.x = player.pos.x + PLAYER_SECTION_OFFSET_X;
+        playerBallBottom.pos.x = player.pos.x + PLAYER_SECTION_OFFSET_X;
+        playerBallTop.pos.y = player.pos.y - PLAYER_SECTION_OFFSET_Y;
+        playerBallBottom.pos.y = player.pos.y + PLAYER_SECTION_OFFSET_Y;
+    };
     // Borders
     add([
         rect(width(), 2),
@@ -154,6 +176,7 @@ scene("game", () => {
         };
     };
 
+    // Enemy health manager
     let health = (hp) => {
         return {
             hurt(n) {
@@ -163,7 +186,11 @@ scene("game", () => {
                     destroy(this);
                     camShake(12);
                     makeExplosion(this.pos, 3, 6, 1);
-                    score++;
+                    if (this.is("enemyShooter")) {
+                        score += 3;
+                    } else {
+                        score++;
+                    }
                 }
             },
             hp() {
@@ -321,7 +348,7 @@ scene("game", () => {
         ]);
     };
     action("enemyBullet", (bullet) => {
-        bullet.move(-BULLET_SPEED *0.9, 0);
+        bullet.move(-BULLET_SPEED *0.5, 0);
         if (bullet.pos.x < 0) {
             destroy(bullet);
         }
@@ -348,11 +375,12 @@ scene("game", () => {
     // Controls
     let move = (x, y) => {
         if (!dead) {
+            lastMoved = time();
             player.move(x * SPEED, y * SPEED);
-            wait(0.5, () => {
+            wait(MOVEMENT_DELAY, () => {
                 playerBallTop.move(x * SPEED, y * SPEED);
             });
-            wait(0.5, () => {
+            wait(MOVEMENT_DELAY, () => {
                 playerBallBottom.move(x * SPEED, y * SPEED);
             });
         }
