@@ -34,6 +34,9 @@ loadSprite("powerUpWipe", "sprites/PowerUpWipe.png");
 loadSprite("enemy", "sprites/Enemy.png");
 loadSprite("enemyShooter", "sprites/EnemyShooter.png");
 
+loadSound("spaceCrazy", "sfx/Space_Crazy.mp3");
+const MUSIC_DETUNE = 200;
+
 scene("game", () => {
     let score = 0;
     let dead = false;
@@ -41,6 +44,9 @@ scene("game", () => {
     let shootTimeout = - SHOOT_TIMEOUT / 2;
     let secondTimer = 0;
     let lastMoved = 0;
+
+    const music = play("spaceCrazy");
+
 
     // UI
     layers([
@@ -306,6 +312,7 @@ scene("game", () => {
     // Player death
     let die = () => {
         dead = true;
+        music.stop();
         destroy(player);
         destroy(playerBallBottom);
         destroy(playerBallTop);
@@ -412,6 +419,7 @@ scene("game", () => {
             playerBallTop.changeSprite("playerTopInvincible");
             playerBallBottom.changeSprite("playerBottomInvincible");
             invincible = true;
+            music.detune(MUSIC_DETUNE);
             // Flash then turn off
             wait(POWERUP_DURATION - 2, () => {
                 player.changeSprite("playerMid");
@@ -438,6 +446,7 @@ scene("game", () => {
                 playerBallTop.changeSprite("playerTop");
                 playerBallBottom.changeSprite("playerBottom");
                 invincible = false;
+                music.detune(0);
             });
 
         } else if (powerUp.is("wipe")) {
