@@ -8,7 +8,6 @@ kaboom({
     debug: false,
 });
 
-let highScore = 0;
 const SPEED = 150;
 const SHOOT_TIMEOUT = 0.1;
 const BULLET_SPEED = 400;
@@ -24,64 +23,8 @@ loadSprite("playerBottom", "sprites/PlayerBottom.png");
 loadSprite("playerTopInvincible", "sprites/PlayerTopInvincible.png");
 loadSprite("playerMidInvincible", "sprites/PlayerMidInvincible.png");
 loadSprite("playerBottomInvincible", "sprites/PlayerBottomInvincible.png");
-loadSprite("PowerUpInvincibility", "sprites/PowerUpInvincibility.png");
-
-scene("menu", (score) => {
-    if (score && score > highScore) {
-        highScore = score;
-    }
-
-    add([
-        text("Triple Threat"),
-        pos(240, 80),
-        origin("center"),
-        scale(3),
-    ]);
-    add([
-        text("Your High Score: " + highScore),
-        pos(240, 160),
-        origin("center"),
-        scale(2),
-    ]);
-    add([
-        text("Author High Score: " + 0),
-        pos(240, 200),
-        origin("center"),
-        scale(2),
-    ]);
-
-    add([
-        rect(160, 20),
-        pos(240, 280),
-        origin("center"),
-        "button",
-        {
-            clickAction: () => go('game'),
-        },
-    ]);
-
-    add([
-        text("Play game"),
-        pos(240, 280),
-        origin("center"),
-        color(0, 0, 0)
-    ]);
-
-    action("button", b => {
-
-        if (b.isHovered()) {
-            b.use(color(0.7, 0.7, 0.7));
-        } else {
-            b.use(color(1, 1, 1));
-        }
-
-        if (b.isClicked()) {
-            b.clickAction();
-        }
-
-    });
-
-});
+loadSprite("powerUpInvincibility", "sprites/PowerUpInvincibility.png");
+loadSprite("enemy", "sprites/Enemy.png");
 
 scene("game", () => {
     let score = 0;
@@ -207,7 +150,7 @@ scene("game", () => {
     // Generic enemy
     let spawnEnemy = () => {
         add([
-            rect(10, 10),
+            sprite("enemy"),
             pos(width() + 10, rand(0, height())),
             health(rand(ENEMY_HEALTH - 3, ENEMY_HEALTH + 3)),
             origin("center"),
@@ -250,7 +193,7 @@ scene("game", () => {
     // Power up
     let spawnPowerUp = () => {
         add([
-            sprite("PowerUpInvincibility"),
+            sprite("powerUpInvincibility"),
             pos(width() + 10, rand(0, height())),
             origin("center"),
             "powerUp",
@@ -403,5 +346,3 @@ scene("game", () => {
     spawnStar();
     spawnPowerUp();
 });
-
-start("menu");
