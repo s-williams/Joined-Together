@@ -17,9 +17,13 @@ init({
     scale: 2,
 });
 
-loadSprite("playerTop", "sprites/playerTop.png");
-loadSprite("playerMid", "sprites/playerMid.png");
-loadSprite("playerBottom", "sprites/playerBottom.png");
+loadSprite("playerTop", "sprites/PlayerTop.png");
+loadSprite("playerMid", "sprites/PlayerMid.png");
+loadSprite("playerBottom", "sprites/PlayerBottom.png");
+loadSprite("playerTopInvincible", "sprites/PlayerTopInvincible.png");
+loadSprite("playerMidInvincible", "sprites/PlayerMidInvincible.png");
+loadSprite("playerBottomInvincible", "sprites/PlayerBottomInvincible.png");
+loadSprite("powerUp", "sprites/PowerUp.png");
 
 scene("menu", (score) => {
     if (score && score > highScore) {
@@ -76,6 +80,7 @@ scene("menu", (score) => {
 scene("game", () => {
     let score = 0;
     let dead = false;
+    let invincible = false;
     let shootTimeout = - SHOOT_TIMEOUT / 2;
     // Player
     let player = add([
@@ -88,14 +93,14 @@ scene("game", () => {
     let playerBallTop = add([
         sprite("playerTop"),
         scale(1),
-        pos(20, 160),
+        pos(40, 160),
         origin("center"),
         "playerBall"
     ]);
     let playerBallBottom = add([
         sprite("playerBottom"),
         scale(1),
-        pos(20, 200),
+        pos(40, 200),
         origin("center"),
         "playerBall"
     ]);
@@ -176,6 +181,7 @@ scene("game", () => {
                 if (hp <= 0) {
                     destroy(this);
                     makeExplosion(this.pos, 3, 6, 1);
+                    score++;
                 }
             },
             hp() {
@@ -191,6 +197,7 @@ scene("game", () => {
         }
     };
 
+    // Generic enemy
     let spawnEnemy = () => {
         add([
             rect(10, 10),
@@ -207,7 +214,6 @@ scene("game", () => {
     };
 
     action("enemy", (enemy) => { moveLeft(enemy); });
-
     // Background stars
     let spawnStar = () => {
         add([
@@ -219,7 +225,6 @@ scene("game", () => {
             {
                 speed: rand(STAR_SPEED * 0.5, STAR_SPEED * 1.5),
             },
-
         ]);
         add([
             rect(1, 1),
@@ -230,11 +235,26 @@ scene("game", () => {
             {
                 speed: rand(STAR_SPEED * 0.5, STAR_SPEED * 1.5),
             },
-
         ]);
         wait(0.1, spawnStar);
     };
     action("star", (star) => { moveLeft(star); });
+
+    // Power up
+    let spawnPowerUp = () => {
+        add([
+            sprite("powerUp"),
+            pos(WIDTH + 10, rand(0, HEIGHT)),
+            origin("center"),
+            "powerUp",
+            "invincibility",
+            {
+                speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
+            },
+        ]);
+        wait(2, spawnPowerUp);
+    };
+    action("powerUp", (powerUp) => { moveLeft(powerUp); });
 
     // Player death
     let die = () => {
@@ -264,8 +284,8 @@ scene("game", () => {
         if (!dead) {
             if (time() > shootTimeout + SHOOT_TIMEOUT) {
                 shootTimeout = time();
-                spawnBullet(playerBallBottom.pos.sub(0, 1), "bullet");
-                spawnBullet(playerBallBottom.pos.add(0, 1), "bullet");
+                spawnBullet(playerBallBottom.pos.sub(0, 2), "bullet");
+                spawnBullet(playerBallBottom.pos.add(0, 2), "bullet");
             }
         }
     };
@@ -323,10 +343,19 @@ scene("game", () => {
     player.collides("border", () => { die(); });
     playerBallTop.collides("border", () => { die(); });
     playerBallBottom.collides("border", () => { die(); });
-    player.collides("enemy", () => { die(); });
-    playerBallTop.collides("enemy", () => { die(); });
-    playerBallBottom.collides("enemy", () => { die(); });
-    player.collides("enemyBullet", () => { die(); });
+    player.collides("enemy", () => { if (!invincible) die(); });
+    playerBallTop.collides("enemy", () => { if (!invincible) die(); });
+    playerBallBottom.collides("enemy", () => { if (!invincible) die(); });
+    player.collides("enemyBullet", () => { if (!invincible) die(); });
+    playerBallTop.collides("powerUp", (powerUp) => {
+        if (powerUp.is("invincibility")) {
+            // player.changeSprite("playerMidInvincible");
+            // playerBallTop.changeSprite("playerTopInvincible");
+            // playerBallBottom.changeSprite("playerB ottomInvincible");
+            invincible = true;
+        }
+        destroy(powerUp);
+    });
     collides("bullet", "enemy", (bullet, enemy) => {
         destroy(bullet);
         enemy.hurt(BULLET_DAMAGE);
@@ -336,6 +365,7 @@ scene("game", () => {
     // To start the adventure
     spawnEnemy();
     spawnStar();
+    spawnPowerUp();
 });
 
 start("game");
