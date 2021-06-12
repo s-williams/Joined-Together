@@ -46,7 +46,7 @@ loadSound("item3", "sfx/Item 3.wav");
 loadSound("killAll", "sfx/Kill All Effect.wav");
 loadSound("laser1", "sfx/Laser 1.wav");
 loadSound("laser2", "sfx/Laser 2.wav");
-loadSound("hum", "sfx/Humming.wav");
+loadSound("hum", "sfx/Low Humming.mp3");
 const MUSIC_DETUNE = 200;
 
 scene("game", () => {
@@ -491,7 +491,9 @@ scene("game", () => {
     // Controls
     let move = (x, y) => {
         if (!dead) {
-            play("hum");
+            let engine = play("hum", {
+                volume: 0.15,
+            });
             lastMoved = time();
             player.move(x * SPEED, y * SPEED);
             wait(MOVEMENT_DELAY, () => {
