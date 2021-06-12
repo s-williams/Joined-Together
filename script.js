@@ -14,6 +14,7 @@ const BULLET_SPEED = 400;
 const BULLET_DAMAGE = 1;
 const ENEMY_HEALTH = 5;
 const ENEMY_SPEED = 50;
+const ENEMY_SHOT_FREQ = 5;
 const STAR_SPEED = 400;
 const POWERUP_DURATION = 15;
 const POWERUP_FREQUENCY = 15;
@@ -27,6 +28,7 @@ loadSprite("playerBottomInvincible", "sprites/PlayerBottomInvincible.png");
 loadSprite("powerUpInvincibility", "sprites/PowerUpInvincibility.png");
 loadSprite("powerUpWipe", "sprites/PowerUpWipe.png");
 loadSprite("enemy", "sprites/Enemy.png");
+loadSprite("enemyShooter", "sprites/EnemyShooter.png");
 
 scene("game", () => {
     let score = 0;
@@ -192,8 +194,33 @@ scene("game", () => {
         ]);
         wait(0.3, spawnEnemy);
     };
-
     action("enemy", (enemy) => { moveLeft(enemy); });
+
+    // Shooting enemy
+    let spawnEnemyShooter = () => {
+        add([
+            sprite("enemyShooter"),
+            pos(width() + 10, rand(0, height())),
+            health(rand(ENEMY_HEALTH - 0, ENEMY_HEALTH + 6)),
+            origin("center"),
+            color(1, 1, 0),
+            "enemy",
+            "enemyShooter",
+            {
+                speed: rand(ENEMY_SPEED * 0.2, ENEMY_SPEED * 1.2),
+                shotFreq: rand(ENEMY_SHOT_FREQ * 0.9, ENEMY_SHOT_FREQ * 1.1),
+                lastShot: time() - ENEMY_SHOT_FREQ / 2,
+            },
+        ]);
+        wait(1, spawnEnemyShooter);
+    };
+    action("enemyShooter", (enemyShooter) => {
+        if (time() > enemyShooter.lastShot + enemyShooter.shotFreq) {
+            enemyShooter.lastShot = time();
+            spawnBullet(enemyShooter.pos, rgb(255, 255, 0), 5, "enemyBullet");
+        }
+    });
+
     // Background stars
     let spawnStar = () => {
         add([
@@ -263,6 +290,7 @@ scene("game", () => {
             wait(0.1 * i, () => {
                 every((obj) => {
                     obj.angle = rand(0, 360);
+                    camShake(4);
                     obj.move(rand(0, width()), rand(0, height()));
                 });
             });
@@ -273,24 +301,31 @@ scene("game", () => {
         });
     };
 
-    // Player shooting mechanics
+    // shooting mechanics
     let shoot = () => {
         if (!dead) {
             if (time() > shootTimeout + SHOOT_TIMEOUT) {
                 shootTimeout = time();
-                spawnBullet(playerBallBottom.pos.sub(0, 2), "bullet");
-                spawnBullet(playerBallBottom.pos.add(0, 2), "bullet");
+                spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(255, 255, 255), 1, "bullet");
+                spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
             }
         }
     };
-    let spawnBullet = (position, tag) => {
+    let spawnBullet = (position, colour, thickness, tag) => {
         add([
-            rect(6, 1),
+            rect(6, thickness),
+            color(colour),
             pos(position),
             origin("center"),
             tag,
         ]);
     };
+    action("enemyBullet", (bullet) => {
+        bullet.move(-BULLET_SPEED *0.9, 0);
+        if (bullet.pos.x < 0) {
+            destroy(bullet);
+        }
+    });
     action("bullet", (bullet) => {
         bullet.move(BULLET_SPEED, 0);
         if (bullet.pos.x > width()) {
@@ -341,6 +376,8 @@ scene("game", () => {
     playerBallTop.collides("enemy", (enemy) => { if (!invincible) { die(); } else { enemy.hurt(999); } });
     playerBallBottom.collides("enemy", (enemy) => { if (!invincible) { die(); } else { enemy.hurt(999); } });
     player.collides("enemyBullet", () => { if (!invincible) die(); });
+    playerBallTop.collides("enemyBullet", () => { if (!invincible) die(); });
+    playerBallBottom.collides("enemyBullet", () => { if (!invincible) die(); });
     playerBallTop.collides("powerUp", (powerUp) => {
         if (powerUp.is("invincibility")) {
             player.changeSprite("playerMidInvincible");
@@ -379,6 +416,9 @@ scene("game", () => {
             every("enemy", (enemy) => {
                 enemy.hurt(999);
             });
+            every("enemyBullet", (enemyBullet) => {
+                destroy(enemyBullet);
+            });
         }
         destroy(powerUp);
     });
@@ -392,4 +432,5 @@ scene("game", () => {
     spawnEnemy();
     spawnStar();
     spawnPowerUp();
+    spawnEnemyShooter();
 });
