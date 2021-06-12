@@ -80,6 +80,12 @@ scene("menu", (score) => {
             b.clickAction();
         }
     });
+
+    keyPress("space", () => { go('game'); });
+    keyPress("enter", () => { go('game'); });
+    keyPress("1", () => { go('game'); });
+    keyPress("2", () => { go('instructions'); });
+    keyPress("3", () => { go('credits'); });
 });
 
 scene("credits", () => {
@@ -109,6 +115,10 @@ scene("credits", () => {
             b.clickAction();
         }
     });
+    keyPress("escape", () => { go('menu'); });
+    keyPress("1", () => { go('menu'); });
+    keyPress("2", () => { go('menu'); });
+    keyPress("3", () => { go('menu'); });
 });
 
 scene("instructions", () => {
@@ -153,6 +163,13 @@ scene("instructions", () => {
             b.clickAction();
         }
     });
+
+    keyPress("space", () => { go('game'); });
+    keyPress("enter", () => { go('game'); });
+    keyPress("escape", () => { go('menu'); });
+    keyPress("1", () => { go('game'); });
+    keyPress("2", () => { go('menu'); });
+    keyPress("3", () => { go('menu'); });
 });
 
 start("menu");
