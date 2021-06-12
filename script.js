@@ -33,6 +33,34 @@ scene("game", () => {
     let dead = false;
     let invincible = false;
     let shootTimeout = - SHOOT_TIMEOUT / 2;
+
+    // UI
+    layers([
+        "game",
+        "ui",
+    ], "game");
+    let timerLabel = add([
+        text(0),
+        pos(5, 5),
+        layer("ui"),
+        origin("topleft"),
+        {
+            time: 0,
+        },
+    ]);
+    timerLabel.action(() => {
+        timerLabel.time += dt();
+        timerLabel.text = timerLabel.time.toFixed(2);
+    });
+    let scoreLabel = add([
+        text(0),
+        pos(width() - 5, 5),
+        origin("topright"),
+    ]);
+    scoreLabel.action(() => {
+        scoreLabel.text = score;
+    });
+
     // Player
     let player = add([
         sprite("playerMid"),
