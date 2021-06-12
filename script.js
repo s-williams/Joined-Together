@@ -277,7 +277,6 @@ scene("game", () => {
     let spawnWave = (currentWave) => {
         if (currentWave < waves.length) {
             wait(waves[currentWave][0], () => {
-                console.log(currentWave);
                 let enemyCountInWave = waves[currentWave].length - 1;
                 for (let i = 1; i < waves.length; i++) {
                     let spawnPosition = Math.round(i * (((height() - 80) / (enemyCountInWave + 1)))) + 40;
@@ -292,7 +291,6 @@ scene("game", () => {
             });
         } else {
             // Out of planned waves, just spawn chaotically
-            console.log("Out of waves!");
             spawnEndless(0.5, spawnEnemy);
             spawnEndless(1.5, spawnEnemyShooter);
         }
