@@ -1,10 +1,14 @@
 let highScore = 0;
 
+loadSprite("tutorialShip", "img/TutorialShip.png");
+loadSprite("tutorialEnemies", "img/TutorialEnemies.png");
+loadSprite("tutorialPowerUps", "img/TutorialPowerUps.png");
+
+
 scene("menu", (score) => {
     if (score && score > highScore) {
         highScore = score;
     }
-
     add([
         text("Triple Threat"),
         pos(240, 80),
@@ -23,7 +27,6 @@ scene("menu", (score) => {
         origin("center"),
         scale(2),
     ]);
-
     add([
         rect(160, 20),
         pos(240, 240),
@@ -80,7 +83,6 @@ scene("menu", (score) => {
             b.clickAction();
         }
     });
-
     keyPress("space", () => { go('game'); });
     keyPress("enter", () => { go('game'); });
     keyPress("1", () => { go('game'); });
@@ -179,6 +181,44 @@ scene("instructions", () => {
         },
     ]);
     add([
+        text("<-- This is your ship.\n" +
+            "It's made up of 3 parts.\n\n" +
+            "The middle part has the engine.\n" +
+            "Control it with WASD\n" +
+            "or with Arrow Keys.\n\n" +
+            "The bottom part has the missiles.\n" +
+            "Fire with SPACE or LMB\n" +
+            "or with Arrow Keys.\n" + 
+            "Try and hit your enemies -->\n\n" +
+            "The top part collects power ups.\n" +
+            "These wipe the screen, give you\n" + 
+            "invincibility or upgrade your\n" + 
+            "weapon."),
+        pos(240, 20),
+        scale(1),
+        origin("top")
+    ]);
+    add([
+        sprite("tutorialShip"),
+        pos(0, 0),
+        origin("topleft"),
+    ]);
+    add([
+        sprite("tutorialEnemies"),
+        pos(width(), 0),
+        origin("topright"),
+    ]);
+    add([
+        sprite("tutorialPowerUps"),
+        pos(240, 180),
+        origin("center"),
+    ]);
+    add([
+        text("Note the bars between ship parts cannot be damaged.\n\nGood luck!"),
+        pos(240, 240),
+        origin("center"),
+    ]);
+    add([
         text("Play game"),
         pos(240, 270),
         origin("center"),
@@ -219,4 +259,4 @@ scene("instructions", () => {
     keyPress("3", () => { go('menu'); });
 });
 
-start("menu");
+start("instructions");
