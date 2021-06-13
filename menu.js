@@ -210,7 +210,7 @@ scene("instructions", () => {
     ]);
     add([
         sprite("tutorialPowerUps"),
-        pos(240, 180),
+        pos(240, 190),
         origin("center"),
     ]);
     add([
@@ -259,4 +259,4 @@ scene("instructions", () => {
     keyPress("3", () => { go('menu'); });
 });
 
-start("instructions");
+start("menu");
