@@ -359,18 +359,7 @@ scene("game", () => {
                     speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
                 },
             ]);
-        } else if (choose > 1) {
-            add([
-                sprite("powerUpWipe"),
-                pos(width() + 10, rand(50, height() - 50)),
-                origin("center"),
-                "powerUp",
-                "wipe",
-                {
-                    speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
-                },
-            ]);
-        } else {
+        } else if (!invincible && choose > 1) {
             add([
                 sprite("powerUpInvincibility"),
                 pos(width() + 10, rand(50, height() - 50)),
@@ -381,7 +370,18 @@ scene("game", () => {
                     speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
                 },
             ]);
-        }
+        } else {
+            add([
+                sprite("powerUpWipe"),
+                pos(width() + 10, rand(50, height() - 50)),
+                origin("center"),
+                "powerUp",
+                "wipe",
+                {
+                    speed: rand(ENEMY_SPEED * 0.3, ENEMY_SPEED * 1.8),
+                },
+            ]);
+        } 
         wait(rand(POWERUP_FREQUENCY * 0.8, POWERUP_FREQUENCY * 1.2), spawnPowerUp);
     };
     action("powerUp", (powerUp) => { moveLeft(powerUp); });
