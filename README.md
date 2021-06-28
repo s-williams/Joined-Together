@@ -4,3 +4,5 @@ Triple Threat is a JavaScript game, made using [Kaboom.js](https://kaboomjs.com/
 The game is available to play, for free, in your browser at: https://swilliamsio.itch.io/triple-threat
 
 ![A screenshot of Triple Threat](img/ScreenShot4.png "Exciting?")
+
+All programming and art was made by [s-williams](https://github.com/s-williams), with music and SFX created by [Silverpine Project](https://linktr.ee/silverpineproject).

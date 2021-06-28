@@ -1,0 +1,1 @@
+Although this project is publicly available, it is not open source software. Copyright 2021: programming and GFX by Scott Alexander Williams (swilliamsio), music and SFX by Silverpine Project. All rights reserved.
