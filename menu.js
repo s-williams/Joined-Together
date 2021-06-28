@@ -126,7 +126,7 @@ scene("credits", () => {
         "button",
         {
             clickAction: () => {
-                window.open("https://www.swilliams.io/", '_blank').focus();
+                window.open("https://www.swilliams.io/", '_blank');
             }
         },
     ]);
@@ -150,7 +150,7 @@ scene("credits", () => {
         "button",
         {
             clickAction: () => {
-                window.open("https://linktr.ee/silverpineproject", '_blank').focus();
+                window.open("https://linktr.ee/silverpineproject", '_blank');
             }
         },
     ]);
