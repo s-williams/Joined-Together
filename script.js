@@ -316,7 +316,7 @@ scene("game", () => {
         }
     };
     let spawnEndless = (delay, enemyFunction) => {
-        enemyFunction(rand(0, height()));
+        enemyFunction(rand(5, height() - 5));
         wait(delay, () => spawnEndless(delay, enemyFunction));
     };
 
@@ -511,14 +511,19 @@ scene("game", () => {
             });
         }
     };
-    keyDown("right", () => { move(1, 0); });
-    keyDown("left", () => { move(-1, 0); });
-    keyDown("up", () => { move(0, -1); });
-    keyDown("down", () => { move(0, 1); });
+    // right
     keyDown("d", () => { move(1, 0); });
-    keyDown("a", () => { move(-1, 0); });
+    keyDown("right", () => { move(1, 0); });
+    // left
+    keyDown("a", () => { if (player.pos.x > 10) move(-1, 0); });
+    keyDown("left", () => { if (player.pos.x > 10) move(-1, 0); });
+    // up
     keyDown("w", () => { move(0, -1); });
+    keyDown("up", () => { move(0, -1); });
+    // down
     keyDown("s", () => { move(0, 1); });
+    keyDown("down", () => { move(0, 1); });
+    // shoot
     keyDown("space", () => { shoot(); });
     mouseDown(() => { shoot(); });
 
