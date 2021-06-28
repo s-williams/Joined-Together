@@ -170,7 +170,7 @@ scene("game", () => {
                 detune: detune,
             });
         }
-    }
+    };
 
     let makeExplosion = (p, n, rad, size) => {
         for (let i = 0; i < n; i++) {
