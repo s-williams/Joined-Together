@@ -17,6 +17,7 @@ const ENEMY_SPEED = 50;
 const ENEMY_SHOT_FREQ = 5;
 const STAR_SPEED = 400;
 const POWERUP_DURATION = 15;
+const POWERUP_SPAWN_DELAY = 20;
 const POWERUP_FREQUENCY = 10;
 const PLAYER_SECTION_OFFSET_X = 20;
 const PLAYER_SECTION_OFFSET_Y = 20;
@@ -586,5 +587,5 @@ scene("game", () => {
     // To start the adventure
     wait(1, () => spawnWave(wave));
     spawnStar();
-    wait(20, () => spawnPowerUp());
+    wait(POWERUP_SPAWN_DELAY, () => spawnPowerUp());
 });
