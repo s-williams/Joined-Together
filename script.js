@@ -62,6 +62,7 @@ scene("game", () => {
 
     const music = play("spaceCrazy", {
         loop: true,
+        volume: musicMuted ? 0 : 1.00
     });
 
     // UI
@@ -159,6 +160,18 @@ scene("game", () => {
         "border",
     ]);
 
+    // Play SFX if its unmuted
+    let playSfx = (sfx, volume, detune) => {
+        volume = volume || 1.0;
+        detune = detune || 0;
+        if (!sfxMuted) {
+            play(sfx, {
+                volume: volume,
+                detune: detune,
+            });
+        }
+    }
+
     let makeExplosion = (p, n, rad, size) => {
         for (let i = 0; i < n; i++) {
             wait(rand(n * 0.1), () => {
@@ -205,9 +218,9 @@ scene("game", () => {
                 hp -= (n === undefined ? 1 : n);
                 this.trigger("hurt");
                 camShake(4);
-                play("enemyDie1");
+                playSfx("enemyDie1");
                 if (hp <= 0) {
-                    play("enemyDie2");
+                    playSfx("enemyDie2");
                     destroy(this);
                     camShake(12);
                     makeExplosion(this.pos, 3, 6, 1);
@@ -266,7 +279,7 @@ scene("game", () => {
     };
     action("enemyShooter", (enemyShooter) => {
         if (time() > enemyShooter.lastShot + enemyShooter.shotFreq) {
-            play("laser2");
+            playSfx("laser2");
             enemyShooter.lastShot = time();
             spawnBullet(enemyShooter.pos, rgb(255, 255, 0), 5, "enemyBullet");
         }
@@ -391,7 +404,7 @@ scene("game", () => {
     let die = () => {
         dead = true;
         music.stop();
-        play("gameOver");
+        playSfx("gameOver");
         destroy(player);
         destroy(playerBallBottom);
         destroy(playerBallTop);
@@ -421,42 +434,28 @@ scene("game", () => {
                 shootTimeout = time();
                 if (strength === 0) {
                     spawnBullet(playerBallBottom.pos, rgb(255, 255, 255), 1, "bullet");
-                    play("laser1", {
-                        volume: 0.5,
-                    });
+                    playSfx("laser1", 0.5);
                 } else if (strength === 1) {
                     spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(255, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
-                    play("laser1", {
-                        volume: 0.5,
-                        detune: -100,
-                    });
+                    playSfx("laser1", 0.5, -100);
                 } else if (strength === 2) {
                     spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(255, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos, rgb(255, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
-                    play("laser1", {
-                        volume: 0.5,
-                        detune: -200,
-                    });
+                    playSfx("laser1", 0.5, -200);
                 } else if (strength === 3) {
                     spawnBullet(playerBallBottom.pos.sub(0, 4), rgb(255, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(255, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.add(0, 4), rgb(255, 255, 255), 1, "bullet");
-                    play("laser1", {
-                        volume: 0.5,
-                        detune: -300,
-                    });
+                    playSfx("laser1", 0.5, -300);
                 } else {
                     spawnBullet(playerBallBottom.pos.sub(0, 4), rgb(0, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(0, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.add(0, 2), rgb(0, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.add(0, 4), rgb(0, 255, 255), 1, "bullet");
-                    play("laser1", {
-                        volume: 0.5,
-                        detune: -400,
-                    });
+                    playSfx("laser1", 0.5, -400);
                 }
             }
         }
@@ -498,9 +497,7 @@ scene("game", () => {
     // Controls
     let move = (x, y) => {
         if (!dead) {
-            let engine = play("hum", {
-                volume: 0.15,
-            });
+            let engine = playSfx("hum", 0.15);
             lastMoved = time();
             player.move(x * SPEED, y * SPEED);
             wait(MOVEMENT_DELAY, () => {
@@ -539,7 +536,7 @@ scene("game", () => {
     playerBallBottom.collides("enemyBullet", () => { if (!invincible) die(); });
     playerBallTop.collides("powerUp", (powerUp) => {
         if (powerUp.is("invincibility")) {
-            play("item1");
+            playSfx("item1");
             player.changeSprite("playerMidInvincible");
             playerBallTop.changeSprite("playerTopInvincible");
             playerBallBottom.changeSprite("playerBottomInvincible");
@@ -575,8 +572,8 @@ scene("game", () => {
             });
 
         } else if (powerUp.is("wipe")) {
-            play("item2");
-            play("killAll");
+            playSfx("item2");
+            playSfx("killAll");
             every("enemy", (enemy) => {
                 enemy.hurt(999);
             });
@@ -584,7 +581,7 @@ scene("game", () => {
                 destroy(enemyBullet);
             });
         } else if (powerUp.is("strength")) {
-            play("item3");
+            playSfx("item3");
             strength++;
         }
         destroy(powerUp);

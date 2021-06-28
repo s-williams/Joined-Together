@@ -72,6 +72,43 @@ scene("menu", (score) => {
         origin("center"),
         color(0, 0, 0)
     ]);
+    // Music and SFX mute buttons
+    add([
+        rect(70, 20),
+        pos(195, 330),
+        origin("center"),
+        "button",
+        {
+            clickAction: () => {
+                musicMuted = !musicMuted;
+                musicText.text = musicMuted ? "Muted" : "Music";
+            }
+        },
+    ]);
+    let musicText = add([
+        text(musicMuted ? "Muted" : "Music"),
+        pos(195, 330),
+        origin("center"),
+        color(0, 0, 0)
+    ]);
+    add([
+        rect(70, 20),
+        pos(285, 330),
+        origin("center"),
+        "button",
+        {
+            clickAction: () => {
+                sfxMuted = !sfxMuted;
+                sfxText.text = sfxMuted ? "Muted" : "SFX";
+            }
+        },
+    ]);
+    let sfxText = add([
+        text(sfxMuted ? "Muted" : "SFX"),
+        pos(285, 330),
+        origin("center"),
+        color(0, 0, 0)
+    ]);
     action("button", b => {
         if (b.isHovered()) {
             b.use(color(0.7, 0.7, 0.7));
