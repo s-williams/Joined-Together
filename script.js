@@ -421,11 +421,14 @@ scene("game", () => {
                 shootTimeout = time();
                 if (strength === 0) {
                     spawnBullet(playerBallBottom.pos, rgb(255, 255, 255), 1, "bullet");
-                    play("laser1");
+                    play("laser1", {
+                        volume: 0.5,
+                    });
                 } else if (strength === 1) {
                     spawnBullet(playerBallBottom.pos.sub(0, 2), rgb(255, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
                     play("laser1", {
+                        volume: 0.5,
                         detune: -100,
                     });
                 } else if (strength === 2) {
@@ -433,6 +436,7 @@ scene("game", () => {
                     spawnBullet(playerBallBottom.pos, rgb(255, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
                     play("laser1", {
+                        volume: 0.5,
                         detune: -200,
                     });
                 } else if (strength === 3) {
@@ -441,6 +445,7 @@ scene("game", () => {
                     spawnBullet(playerBallBottom.pos.add(0, 2), rgb(255, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.add(0, 4), rgb(255, 255, 255), 1, "bullet");
                     play("laser1", {
+                        volume: 0.5,
                         detune: -300,
                     });
                 } else {
@@ -449,6 +454,7 @@ scene("game", () => {
                     spawnBullet(playerBallBottom.pos.add(0, 2), rgb(0, 255, 255), 1, "bullet");
                     spawnBullet(playerBallBottom.pos.add(0, 4), rgb(0, 255, 255), 1, "bullet");
                     play("laser1", {
+                        volume: 0.5,
                         detune: -400,
                     });
                 }
